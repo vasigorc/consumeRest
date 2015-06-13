@@ -34,7 +34,7 @@ public class SplashBaseClient implements Closeable{
 
     @Override
     public void close() throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        client.close();
     }
     
 }

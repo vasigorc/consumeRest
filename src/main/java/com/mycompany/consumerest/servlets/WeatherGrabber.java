@@ -5,12 +5,12 @@
  */
 package com.mycompany.consumerest.servlets;
 
-import com.mycompany.consumerest.beans.City;
-import com.mycompany.consumerest.restservices.SplashBaseClient;
+import com.mycompany.consumerest.beans.WeatherRepr;
+import com.mycompany.consumerest.parsers.JsonWeatherParser;
+import com.mycompany.consumerest.restservices.DayWeatherClient;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.Hashtable;
+import java.util.Map;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,37 +22,36 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author vasigorc
  */
-@WebServlet(name = "Main", urlPatterns = {"/home"})
-public class Main extends HttpServlet {
+@WebServlet(name = "OneWeather", urlPatterns = {"/oneweather"})
+public class WeatherGrabber extends HttpServlet {
 
+    private DayWeatherClient dwc;
     /*
-     We will use LinkedHashSet for faster access time and because of relati-
-     vely small number of contained items. Static "synchronizedSet" method
-     assures that the set is thread-safe.
-     */
-    Set<City> cities = Collections.synchronizedSet(new LinkedHashSet<City>());
-    private SplashBaseClient sbc;
+        As there's no need to store just a few entries in a database, we'll hold
+    them in a Map
+    */
+    private static final Map<Integer, String> citiesDb = new Hashtable<>();
+    
+    /*
+        The names of the cities will be store in request format required by
+        the Web Service provider.
+    */
+    static{
+        citiesDb.put(544, "New+York");
+        citiesDb.put(238, "Paris,france");
+        citiesDb.put(353, "London,united+kingdom");
+        citiesDb.put(556, "San+Francisco");
+        citiesDb.put(44, "Athens,greece");
+        citiesDb.put(550, "Bangkok");
+        citiesDb.put(644, "Venice,italy");
+    }
 
     @Override
     public void init() throws ServletException {
-        sbc = new SplashBaseClient();
-        //add cities (id numbers found manually)
-        City newYork = sbc.getOneCity(City.class, "544");
-        City paris = sbc.getOneCity(City.class, "238");
-        City london = sbc.getOneCity(City.class, "353");
-        City sanFrancisco = sbc.getOneCity(City.class, "556");
-        City athens = sbc.getOneCity(City.class, "44");
-        City bangkok = sbc.getOneCity(City.class, "550");
-        City venice = sbc.getOneCity(City.class, "644");
-        cities.add(newYork);
-        cities.add(paris);
-        cities.add(london);
-        cities.add(sanFrancisco);
-        cities.add(athens);
-        cities.add(bangkok);
-        cities.add(venice);
+        dwc  = new DayWeatherClient();
     }
-
+    
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -64,19 +63,19 @@ public class Main extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        try {
-            request.setAttribute("cityList", cities);
-            request.setAttribute("error", "An error produced on the "
-                    + "server side and the list of cities cannot be shown."
-                    + " We're sorry!");
-            String url = "main.jsp";
-            RequestDispatcher rd = request.getRequestDispatcher(url);
+        String cityId = request.getParameter("cityId");
+        String str ="";
+        if (WeatherGrabber.citiesDb.containsKey(Integer.parseInt(cityId))) {
+            str = dwc.getSingleTemp(String.class, WeatherGrabber.citiesDb.get(Integer.parseInt(cityId)));
+        }else{
+            str = dwc.getSingleTemp(String.class, "San+Francisco");
+        }        
+        JsonWeatherParser jwp = new JsonWeatherParser(str);
+        WeatherRepr wr =jwp.getWeatherRepr();
+        request.setAttribute("weather", wr);
+        String url = "aparticularweather.jsp";
+        RequestDispatcher rd = request.getRequestDispatcher(url);
             rd.forward(request, response);
-        } catch (ServletException | IOException e) {
-            System.out.println("We couldn't even get it properly to the client"
-                    + ", Vasile. Please trace the error: "+e.getMessage());
-        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

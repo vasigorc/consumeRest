@@ -19,7 +19,7 @@
         <link rel="stylesheet" href="css/owl-carousel/owl.theme.css"></link>
         <link rel="stylesheet" href="css/owl-carousel/owl.transitions.css"></link>
         <link rel="stylesheet" href="css/mainpage.css"></link>
-<!--        <script type="text/javascript" src="js/jquery.min.js"></script>-->        
+        <!--        <script type="text/javascript" src="js/jquery.min.js"></script>-->        
     </head>
     <body>
 
@@ -28,14 +28,7 @@
             <div class="large-3 columns">
                 <h1><img src="images/Gnome-Weather-Few-Clouds-64.png"></h1>
             </div>
-            <div class="large-9 columns">
-                <ul class="button-group right">
-                    <li><a href="#" class="button">Link 1</a></li>
-                    <li><a href="#" class="button">Link 2</a></li>
-                    <li><a href="#" class="button">Link 3</a></li>
-                    <li><a href="#" class="button">Link 4</a></li>
-                </ul>
-            </div>
+            
         </div>
 
         <div class="row">
@@ -48,8 +41,8 @@
                     <c:otherwise>
                         <div id="homecarousel" class="owl-carousel">
                             <c:forEach items="${cityList}" var="city">
-                                <div class="item"><img style="width: 287px; height: 191px;" id="${city.id}" class="lazyOwl" data-src="${city.url}" alt="Lazy Owl Image"></div>
-                            </c:forEach>
+                                <div class="item"><img style="width: 287px; height: 191px;" id="${city.id}" class="lazyOwl" data-src="${city.url}" alt="Lazy Owl Image" data-bind="event:{click: grabInfo, mouseover: displayCity, mouseout: hideCity}"></div>
+                                </c:forEach>
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -57,40 +50,16 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="large-4 columns">
-                <img src="http://placehold.it/400x300&text=[img]">
-            </div>
-            <div class="large-8 columns">
-                <h4>This is a content section.</h4>
-                <div class="row">
-                    <div class="large-6 columns">
-                        <p>Bacon ipsum dolor sit amet nulla ham qui sint exercitation eiusmod commodo, chuck duis velit. Aute in reprehenderit, dolore aliqua non est magna in labore pig pork biltong. Eiusmod swine spare ribs reprehenderit culpa. Boudin aliqua adipisicing rump corned beef.</p>
-                    </div>
-                    <div class="large-6 columns">
-                        <p>Pork drumstick turkey fugiat. Tri-tip elit turducken pork chop in. Swine short ribs meatball irure bacon nulla pork belly cupidatat meatloaf cow. Nulla corned beef sunt ball tip, qui bresaola enim jowl. Capicola short ribs minim salami nulla nostrud pastrami.</p>
-                    </div>
+        <div id="weathercontent">
+            <div class="row">
+                <div id="initAnnounce" class="confetti" style="font-size: 5em; color: crimson; margin-left: 1em;">
+                    Get current weather for a city
+                </div>
+                <div id="particularCity" class="confetti" style="font-size: 4em; color: #007ba4; margin-left: 1em;">
+                    <span data-bind="text: cityName"></span>
                 </div>
             </div>
         </div>
-
-
-
-
-        <div class="row">
-            <div class="large-8 columns">
-                <h4>This is a content section.</h4>
-
-                <p>Bacon ipsum dolor sit amet nulla ham qui sint exercitation eiusmod commodo, chuck duis velit. Aute in reprehenderit, dolore aliqua non est magna in labore pig pork biltong. Eiusmod swine spare ribs reprehenderit culpa. Boudin aliqua adipisicing rump corned beef.</p>
-
-                <p>Pork drumstick turkey fugiat. Tri-tip elit turducken pork chop in. Swine short ribs meatball irure bacon nulla pork belly cupidatat meatloaf cow. Nulla corned beef sunt ball tip, qui bresaola enim jowl. Capicola short ribs minim salami nulla nostrud pastrami.</p>
-
-            </div>
-            <div class="large-4 columns">
-                <img src="http://placehold.it/400x300&text=[img]">
-            </div>
-        </div>
-
 
 
         <footer class="row">
@@ -98,7 +67,7 @@
                 <hr/>
                 <div class="row">
                     <div class="large-6 columns">
-                        <p>© Copyright no one at all. Go to town.</p>
+                        <p>© A Vasile Gorcinschi's project for Concordia University.</p>
                     </div>
                     <div class="large-6 columns">
                         <ul class="inline-list right">
@@ -118,13 +87,47 @@
         <script type="text/javascript" src="js/owl-carousel/owl.carousel.js"></script>        
         <script>
             $(document).ready(function () {
-                
+
                 $("#homecarousel").owlCarousel({
                     items: 4,
                     lazyLoad: true,
                     navigation: true
                 });
             });
+        </script>
+        <script>
+            function WeatherModel() {
+                var self = this;
+
+                self.cityName = ko.observable("");
+
+                self.citiesMap = [];
+                self.citiesMap["544"] = "New York, US";
+                self.citiesMap["238"] = "Paris, FR";
+                self.citiesMap["353"] = "London, UK";
+                self.citiesMap["556"] = "San Francisco, US";
+                self.citiesMap["44"] = "Athens, GR";
+                self.citiesMap["550"] = "Bangkok, TH";
+                self.citiesMap["644"] = "Venice, IT";
+
+                self.displayCity = function (data, event) {
+                    $("#initAnnounce").text("Get today's weather in");
+                    self.cityName(self.citiesMap[event.target.id]);
+                };
+
+                self.hideCity = function (data, event) {
+                    $("#initAnnounce").text("Get current weather for a city");
+                    self.cityName("");
+                };
+
+                self.grabInfo = function (data, event) {
+                    //alert(event.target.id);
+                    $("#weathercontent").load("oneweather", {cityId: event.target.id});
+                };
+            }
+            ;
+            var weatherModel = new WeatherModel();
+            ko.applyBindings(weatherModel);
         </script>
         <script src="js/owl-carousel/assets/js/bootstrap-collapse.js"></script>
         <script src="js/owl-carousel/assets/js/bootstrap-transition.js"></script>

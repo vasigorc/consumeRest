@@ -7,14 +7,31 @@ and open the template in the editor.
     Created on : 6 juin 2015, 18:31:30
     Author     : vasigorc
 */
-    #homecarousel .item{
-      margin: 3px;
-    }
-    #homecarousel .item img{
-      display: block;
-      width: 100%;
-      height: auto;
-    }
+@font-face{
+    font-family: calligraphic;
+    src: url(../fonts/Darleston.ttf);
+}
 
+@font-face{
+    font-family: confetti;
+    src: url(../fonts/blackrose.TTF);
+}
 
+#homecarousel .item{
+    margin: 3px;
+}
+#homecarousel .item img{
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.calligraphic{
+    font-family: calligraphic;
+    font-size: 200%;
+}
+
+.confetti{
+    font-family: confetti;
+}
 

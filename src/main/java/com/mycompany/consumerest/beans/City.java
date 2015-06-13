@@ -34,7 +34,7 @@ public class City {
 
     public City() {
     }
-
+        
     public String getId() {
         return id;
     }
@@ -66,7 +66,7 @@ public class City {
     public void setSource_id(String source_id) {
         this.source_id = source_id;
     }
-
+    
     public String getCopyright() {
         return copyright;
     }
@@ -90,11 +90,10 @@ public class City {
         int h3 = large_url.hashCode();
         int h4 = site.hashCode();
         int h5 = url.hashCode();
-        int h6 = source_id.hashCode();
-        
+                
         final int HASH_MULTIPLIER = 31;
         
-        int sum = HASH_MULTIPLIER*h1+h2+h3+h4+h5+h6;
+        int sum = HASH_MULTIPLIER*h1+h2+h3+h4+h5;
        
         return sum;
     }
